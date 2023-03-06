@@ -1,39 +1,93 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import './App.scss';
-import Carousel from './components/Carousel';
+import { Carousel } from './components/Carousel';
+import { formReducer } from './formReducer';
+import { initialState } from './variables';
+import { Input } from './components/Input';
+import { CheckBox } from './components/Checkbox';
 
-interface State {
-  images: string[];
-}
+const App: React.FC<{}> = () => {
+  const [state, dispatch] = useReducer(formReducer, initialState);
 
-class App extends React.Component<{}, State> {
-  state = {
-    images: [
-      './img/1.png',
-      './img/2.png',
-      './img/3.png',
-      './img/4.png',
-      './img/5.png',
-      './img/6.png',
-      './img/7.png',
-      './img/8.png',
-      './img/9.png',
-      './img/10.png',
-    ],
+  const {
+    images,
+    itemWidth,
+    frameSize,
+    step,
+    animationDuration,
+    infinite,
+  } = state;
+
+  const handleNumberInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    dispatch({
+      type: 'HANDLE NUMBER INPUT',
+      name,
+      payload: +value,
+    });
   };
 
-  render() {
-    const { images } = this.state;
+  return (
+    <div className="App">
+      {/* eslint-disable-next-line */}
+      <h1 data-cy="title">Carousel with {images.length} images</h1>
 
-    return (
-      <div className="App">
-        {/* eslint-disable-next-line */}
-        <h1>Carousel with {images.length} images</h1>
+      <Carousel
+        images={images}
+        itemWidth={itemWidth}
+        frameSize={frameSize}
+        step={step}
+        animationDuration={animationDuration}
+        infinite={infinite}
+      />
 
-        <Carousel />
+      <div>
+        <Input
+          labelText="Image width"
+          id="itemWidth"
+          min="100"
+          max="300"
+          value={state.itemWidth}
+          handleChange={handleNumberInputChange}
+        />
+        <Input
+          labelText="Number of pictures shown"
+          id="frameSize"
+          min="1"
+          max={images.length.toString()}
+          value={state.frameSize}
+          handleChange={handleNumberInputChange}
+        />
+
+        <Input
+          labelText="Step"
+          id="step"
+          min="1"
+          max="10"
+          value={state.step}
+          handleChange={handleNumberInputChange}
+        />
+
+        <Input
+          labelText="Animation Duration"
+          id="animationDuration"
+          min="500"
+          max="3000"
+          step="500"
+          value={state.animationDuration}
+          handleChange={handleNumberInputChange}
+        />
+
+        <CheckBox
+          labelText="Infinite"
+          id="infinite"
+          checked={state.infinite}
+          onChange={() => dispatch({ type: 'HANDLE CHECKBOX' })}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default App;

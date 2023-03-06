@@ -1,18 +1,90 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Carousel.scss';
 
-const Carousel: React.FC = () => (
-  <div className="Carousel">
-    <ul className="Carousel__list">
-      <li><img src="./img/1.png" alt="1" /></li>
-      <li><img src="./img/1.png" alt="2" /></li>
-      <li><img src="./img/1.png" alt="3" /></li>
-      <li><img src="./img/1.png" alt="4" /></li>
-    </ul>
+type Props = {
+  images: string[];
+  itemWidth: number;
+  frameSize: number;
+  step: number;
+  animationDuration: number;
+  infinite: boolean;
+};
 
-    <button type="button">Prev</button>
-    <button type="button">Next</button>
-  </div>
-);
+export const Carousel: React.FC<Props> = ({
+  images,
+  itemWidth,
+  frameSize,
+  animationDuration,
+  step,
+  infinite,
+}) => {
+  const [shift, setShift] = useState(0);
 
-export default Carousel;
+  const frameWidth = itemWidth * frameSize;
+  const maxShift = (images.length - frameSize) * itemWidth;
+  const possibleShift = itemWidth * step;
+  const fullWidth = images.length * itemWidth;
+
+  const moveRight = () => {
+    if (infinite && (shift === -maxShift)) {
+      setShift(possibleShift);
+    }
+
+    setShift(prevState => (prevState - possibleShift <= -maxShift
+      ? -maxShift
+      : prevState - possibleShift));
+  };
+
+  const moveLeft = () => {
+    if (infinite && (shift === 0)) {
+      setShift(-fullWidth);
+    }
+
+    setShift(prevState => (prevState <= -possibleShift
+      ? prevState + possibleShift
+      : 0));
+  };
+
+  return (
+    <div className="Carousel">
+      <div
+        className="Carousel__wrapper"
+        style={{
+          width: `${frameWidth}px`,
+        }}
+      >
+        <ul
+          className="Carousel__list"
+          style={{
+            transform: `translateX(${shift}px)`,
+            transitionDuration: `${animationDuration}ms`,
+          }}
+        >
+          {images.map((image: string, index: number) => (
+            <li key={image}>
+              <img
+                src={image}
+                alt={`smilie № ${index + 1}`}
+                style={{ width: `${itemWidth}px` }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button
+        type="button"
+        onClick={moveLeft}
+      >
+        Prev
+      </button>
+      <button
+        type="button"
+        data-cy="next"
+        onClick={moveRight}
+      >
+        Next
+      </button>
+    </div>
+  );
+};

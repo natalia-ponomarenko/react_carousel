@@ -1,1 +1,14 @@
 // style go here
+.Carousel {
+  &__wrapper {
+    overflow: hidden;
+    margin: 0 auto;
+  }
+  
+  &__list {
+    width: 1300px;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+}
